@@ -33,7 +33,7 @@ public class MessageActor extends UntypedActor {
 
     public NewsAgentResponse newsAgentResponse = new NewsAgentResponse();
     public FeedResponse feedResponse = new FeedResponse();
-
+    Message messageObject = new Message();
 
     @Override
     public void onReceive(Object message) throws Throwable {
@@ -41,7 +41,7 @@ public class MessageActor extends UntypedActor {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (message instanceof String) {
-            Message messageObject = new Message();
+
             messageObject.text = message.toString();
             messageObject.sender = Message.Sender.USER;
             out.tell(objectMapper.writeValueAsString(messageObject), self());  //to send message over ws
@@ -53,6 +53,11 @@ public class MessageActor extends UntypedActor {
             out.tell(objectMapper.writeValueAsString(messageObject), self());
 
 
+        }
+        else {
+            messageObject.text = "Input is invalid";
+            messageObject.sender = Message.Sender.BOT;
+            out.tell(objectMapper.writeValueAsString(messageObject), self());
         }
 
 
