@@ -33,19 +33,21 @@ public class MessageActor extends UntypedActor {
 
     public NewsAgentResponse newsAgentResponse = new NewsAgentResponse();
     public FeedResponse feedResponse = new FeedResponse();
-    Message messageObject = new Message();
 
     @Override
     public void onReceive(Object message) throws Throwable {
 
         ObjectMapper objectMapper = new ObjectMapper();
+        Message messageObject = new Message();
 
-        if (message instanceof String) {
+
+        if (message instanceof String && message!="") {
+
 
             messageObject.text = message.toString();
             messageObject.sender = Message.Sender.USER;
             out.tell(objectMapper.writeValueAsString(messageObject), self());  //to send message over ws
-            newsAgentResponse = newsAgentService.getNewsAgentResponse(messageObject.text, UUID.randomUUID());
+            newsAgentResponse = newsAgentService.getNewsAgentResponse("Find " + messageObject.text, UUID.randomUUID());
             feedResponse = feedService.getFeedByQuery(newsAgentResponse.query);
             messageObject.text = (feedResponse.title == null) ? "No results found" : "Showing results for: " + newsAgentResponse.query;
             messageObject.feedResponse = feedResponse;
